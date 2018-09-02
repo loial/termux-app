@@ -1,0 +1,26 @@
+cache:
+  paths:
+    - .m2/
+    - .gradle
+    
+variables:
+  ANDROID_COMPILE_SDK: "27"
+  ANDROID_BUILD_TOOLS: "25.0.2"
+  ANDROID_SDK_TOOLS: "27.0.1"
+
+before_script:
+
+stages:
+  - build
+
+build:
+  stage: build
+  script:
+    - export PATH=$PATH:/opt/android-sdk/platform-tools/
+    - chmod +x ./gradlew
+    - ./gradlew assembleDebug
+  artifacts:
+    paths:
+    - app/build/outputs/
+  when:
+    -manual
