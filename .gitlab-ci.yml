@@ -16,7 +16,8 @@ stages:
 build:
   stage: build
   script:
-    - export PATH=$PATH:/opt/android-sdk/platform-tools/
+    - export ANDROID_HOME=/opt/android-sdk
+    - export PATH=$PATH:$ANDROID_HOME/platform-tools/
     - chmod +x ./gradlew
     - ./gradlew assembleDebug
   artifacts:
