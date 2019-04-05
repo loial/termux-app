@@ -10,7 +10,8 @@ steps:
       - /root/.gradle/caches
       - /root/.gradle/wrapper
       - /opt/android-sdk/.android/avd
-    server: localhost
+    server: 
+      from_secret: ssh_server
     username:
       from_secret: ssh_user
     password:
@@ -27,7 +28,8 @@ steps:
 - name: store-artifacts
   image: appleboy/drone-scp
   settings:
-    host: localhost
+    host:
+      from_secret: ssh_server
     user: 
       from_secret: ssh_user
     password:
@@ -45,7 +47,8 @@ steps:
       - /root/.gradle/caches
       - /root/.gradle/wrapper
       - /opt/android-sdk/.android/avd
-    server: localhost
+    server:
+      from_secret: ssh_server
     username:
       from_secret: ssh_user
     password:
