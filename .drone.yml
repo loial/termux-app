@@ -16,12 +16,13 @@ steps:
       from_secret: ssh_user
     password:
       from_secret: ssh_password  
-    path: /docker/gitea/drone_data/cache
+    path: /docker/gitea/drone-data/cache
 
 
 - name: build
   image: mingc/android-build-box:1.7.0
   commands:
+    - if [ ! $(command -v file) ]; then apt-get update ; apt-get -y install file ; fi
     - bash ./gradlew assemble
     - tar -czf ${DRONE_REPO_NAME}_${DRONE_COMMIT_SHA}_build.tar.gz app/build
 
@@ -37,7 +38,7 @@ steps:
     source:
       - ./*build.tar.gz
     target: 
-      - /volume1/docker/gitea/drone_data/artifacts
+      - /volume1/docker/gitea/drone-data/artifacts
 
 - name: rebuild-cache
   image: appleboy/drone-sftp-cache
@@ -53,4 +54,4 @@ steps:
       from_secret: ssh_user
     password:
       from_secret: ssh_password  
-    path: /docker/gitea/drone_data/cache
+    path: /docker/gitea/drone-data/cache
