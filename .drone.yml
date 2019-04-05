@@ -2,7 +2,50 @@ kind: pipeline
 name: default
 
 steps:
+- name: restore-cache
+  image: drillster/drone-volume-cache
+  settings:
+    restore: true
+    mount:
+      - ~/.gradle/caches
+      - ~/.gradle/wrapper
+      - /opt/android-sdk/.android/avd
+  volumes:
+  - name: cache
+    path: /cache
+
+
 - name: build
   image: mingc/android-build-box:1.7.0
   commands:
     - bash ./gradlew assemble
+    - tar -czf ${DRONE_REPO_NAME}_${DRONE_COMMIT_SHA}_build.tar.gz app/build
+
+- name: store-artifacts
+  image: appleboy/drone-scp
+  settings:
+    host: localhost
+    user: Herman
+    password:
+      from_secret: ssh_password
+    source:
+      - ./*build.tar.gz
+    target: 
+      - /volume1/docker/gitea/drone_data
+
+- name: rebuild-cache
+  image: drillster/drone-volume-cache
+  settings:
+    rebuild: true
+    mount:
+      - ~/.gradle/caches
+      - ~/.gradle/wrapper
+      - /opt/android-sdk/.android/avd
+  volumes:
+  - name: cache
+    path: /cache
+
+volumes:
+- name: cache
+  host:
+    path: /tmp/drone/cache
