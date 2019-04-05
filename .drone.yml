@@ -10,12 +10,12 @@ steps:
       - /root/.gradle/caches
       - /root/.gradle/wrapper
       - /opt/android-sdk/.android/avd
-  server: localhost
-  username:
-    from_secret: ssh_user
-  password:
-    from_secret: ssh_password  
-  path: /volume1/docker/gitea/drone_data/cache
+    server: localhost
+    username:
+      from_secret: ssh_user
+    password:
+      from_secret: ssh_password  
+    path: /docker/gitea/drone_data/cache
 
 
 - name: build
@@ -45,9 +45,9 @@ steps:
       - /root/.gradle/caches
       - /root/.gradle/wrapper
       - /opt/android-sdk/.android/avd
-  server: localhost
-  username:
-    from_secret: ssh_user
-  password:
-    from_secret: ssh_password  
-  path: /volume1/docker/gitea/drone_data/cache
+    server: localhost
+    username:
+      from_secret: ssh_user
+    password:
+      from_secret: ssh_password  
+    path: /docker/gitea/drone_data/cache
