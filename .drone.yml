@@ -3,16 +3,19 @@ name: default
 
 steps:
 - name: restore-cache
-  image: drillster/drone-volume-cache
+  image: appleboy/drone-sftp-cache
   settings:
     restore: true
     mount:
-      - ~/.gradle/caches
-      - ~/.gradle/wrapper
+      - /root/.gradle/caches
+      - /root/.gradle/wrapper
       - /opt/android-sdk/.android/avd
-  volumes:
-  - name: cache
-    path: /cache
+  server: localhost
+  username:
+    from_secret: ssh_user
+  password:
+    from_secret: ssh_password  
+  path: /volume1/docker/gitea/drone_data/cache
 
 
 - name: build
@@ -25,27 +28,26 @@ steps:
   image: appleboy/drone-scp
   settings:
     host: localhost
-    user: Herman
+    user: 
+      from_secret: ssh_user
     password:
       from_secret: ssh_password
     source:
       - ./*build.tar.gz
     target: 
-      - /volume1/docker/gitea/drone_data
+      - /volume1/docker/gitea/drone_data/artifacts
 
 - name: rebuild-cache
-  image: drillster/drone-volume-cache
+  image: appleboy/drone-sftp-cache
   settings:
     rebuild: true
     mount:
-      - ~/.gradle/caches
-      - ~/.gradle/wrapper
+      - /root/.gradle/caches
+      - /root/.gradle/wrapper
       - /opt/android-sdk/.android/avd
-  volumes:
-  - name: cache
-    path: /cache
-
-volumes:
-- name: cache
-  host:
-    path: /tmp/drone/cache
+  server: localhost
+  username:
+    from_secret: ssh_user
+  password:
+    from_secret: ssh_password  
+  path: /volume1/docker/gitea/drone_data/cache
