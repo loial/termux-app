@@ -22,9 +22,10 @@ steps:
 - name: build
   image: mingc/android-build-box:1.7.0
   commands:
-    - if [ ! $(command -v file) ]; then apt-get update ; apt-get -y install file ; fi
+    - if [ ! $(command -v file) ]; then apt-get update ; apt-get -y install file netcat ; fi
     - bash ./gradlew assemble
     - tar -czf ${DRONE_REPO_NAME}_${DRONE_COMMIT_SHA}_build.tar.gz app/build
+    - ( echo -e "HTTP/1.1 200 OK\n\n{\"status\":\"continue\"}" | nc -l 8888 ; killall sleep 2>/dev/null) & echo 'Wait upto 1 hour, or connect on port 8888 to continue' ; sleep 1h ; killall nc 2>/dev/null
 
 - name: store-artifacts
   image: appleboy/drone-scp
