@@ -7,9 +7,9 @@ steps:
   settings:
     restore: true
     mount:
-      - cache_gradle
-      - cache_gradlewrapper
-      - cache_androidavd
+      - /root/.gradle/caches
+      - /root/.gradle/wrapper
+      - /opt/android-sdk/.android/avd
     server: 
       from_secret: ssh_server
     username:
@@ -21,9 +21,9 @@ steps:
 - name: build
   image: mingc/android-build-box:1.7.0
   volumes:
-          - cache_gradle:/root/.gradle/caches
-          - cache_gradlewrapper:/root/.gradle/wrapper
-          - cache_androidavd:/opt/android-sdk/.android/avd
+    - /root/.gradle/caches:/root/.gradle/caches
+    - /root/.gradle/wrapper:/root/.gradle/wrapper
+    - /opt/android-sdk/.android/avd:/opt/android-sdk/.android/avd
   commands:
     - if [ ! $(command -v file) ]; then apt-get update ; apt-get -y install file ; fi
     - bash ./gradlew assemble
@@ -48,9 +48,9 @@ steps:
   settings:
     rebuild: true
     mount:
-      - cache_gradle
-      - cache_gradlewrapper
-      - cache_androidavd
+      - /root/.gradle/caches
+      - /root/.gradle/wrapper
+      - /opt/android-sdk/.android/avd
     server:
       from_secret: ssh_server
     username:
@@ -58,11 +58,3 @@ steps:
     password:
       from_secret: ssh_password  
     path: /docker/gitea/drone-data/cache
-
-volumes:
-  - name: cache_gradle
-    temp: {}
-  - name: cache_gradlewrapper
-    temp: {}
-  - name: cache_androidavd
-    temp: {}
