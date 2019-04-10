@@ -4,12 +4,19 @@ name: default
 steps:
 - name: restore-cache
   image: appleboy/drone-sftp-cache
+  volumes:
+    - name: cache_gradle
+      path: /tmp/cache_gradle
+    - name: cache_gradlewrapper
+      path: /tmp/gradlewrapper
+    - name: cache_androidavd
+      path: /tmp/androidavd
   settings:
     restore: true
     mount:
-      - cache_gradle
-      - cache_gradlewrapper
-      - cache_androidavd
+      - /tmp/cache_gradle
+      - /tmp/cache_gradlewrapper
+      - /tmp/cache_androidavd
     server: 
       from_secret: ssh_server
     username:
@@ -48,6 +55,13 @@ steps:
 
 - name: rebuild-cache
   image: appleboy/drone-sftp-cache
+  volumes:
+    - name: cache_gradle
+      path: /tmp/cache_gradle
+    - name: cache_gradlewrapper
+      path: /tmp/gradlewrapper
+    - name: cache_androidavd
+      path: /tmp/androidavd
   settings:
     rebuild: true
     mount:
