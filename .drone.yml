@@ -12,7 +12,6 @@ steps:
     - name: cache_androidavd
       path: /tmp/androidavd
   settings:
-    restore: true
     mount:
       - /tmp/cache_gradle
       - /tmp/cache_gradlewrapper
@@ -24,6 +23,7 @@ steps:
     password:
       from_secret: ssh_password  
     path: /docker/gitea/drone-data/cache
+    restore: true
 
 - name: build
   image: mingc/android-build-box:1.7.0
@@ -63,11 +63,10 @@ steps:
     - name: cache_androidavd
       path: /tmp/androidavd
   settings:
-    rebuild: true
     mount:
-      - cache_gradle
-      - cache_gradlewrapper
-      - cache_androidavd
+      - /tmp/cache_gradle
+      - /tmp/cache_gradlewrapper
+      - /tmp/cache_androidavd
     server:
       from_secret: ssh_server
     username:
@@ -75,6 +74,7 @@ steps:
     password:
       from_secret: ssh_password  
     path: /docker/gitea/drone-data/cache
+    rebuild: true
 
 volumes:
   - name: cache_gradle
