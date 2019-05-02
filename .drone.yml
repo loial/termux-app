@@ -25,6 +25,12 @@ steps:
     path: /docker/gitea/drone-data/cache
     restore: true
 
+- name: androidkeys
+  image: obiwan:8008/drone-plugin-androidkeys
+  settings:
+    key_base64:
+      from_secret: release_key_base64
+
 - name: build
   image: mingc/android-build-box:1.7.0
   volumes:
