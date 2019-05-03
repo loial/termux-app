@@ -82,6 +82,23 @@ steps:
     path: /docker/gitea/drone-data/cache
     rebuild: true
 
+- name: gitea_release
+  image: plugins/gitea-release
+  settings:
+    api_key:
+      from_secret: gitea_api_key
+    base_url: https://git.home.sletteng.org
+    files:
+      - app/build/outputs/apk/release/app-release.apk
+      - app/build/outputs/apk/debug/app-debug.apk
+
+    checksum:
+      - md5
+      - sha1
+  when:
+    event: tag
+    branch: mybranch
+
 volumes:
   - name: cache_gradle
     temp: {}
