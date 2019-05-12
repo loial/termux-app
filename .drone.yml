@@ -96,8 +96,9 @@ steps:
       - md5
       - sha1
   when:
-    event: tag
-    branch: mybranch
+    ref:
+    - refs/heads/feature-*
+    - refs/tags/v*
 
 volumes:
   - name: cache_gradle
