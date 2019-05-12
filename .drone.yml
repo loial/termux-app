@@ -32,7 +32,7 @@ steps:
       from_secret: release_key_base64
 
 - name: build
-  image: mingc/android-build-box:1.7.0
+  image: mingc/android-build-box:1.9.0
   volumes:
     - name: cache_gradle
       path: /root/.gradle/caches
