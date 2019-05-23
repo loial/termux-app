@@ -16,12 +16,12 @@ steps:
       - /tmp/cache_gradle
       - /tmp/cache_gradlewrapper
       - /tmp/cache_androidavd
-    server: 
+    server:
       from_secret: ssh_server
     username:
       from_secret: ssh_user
     password:
-      from_secret: ssh_password  
+      from_secret: ssh_password
     path: /docker/gitea/drone-data/cache
     restore: true
 
@@ -29,7 +29,7 @@ steps:
   image: obiwan:8008/drone-plugin-androidkeys
   settings:
     key_base64:
-      from_secret: release_key_base64
+      from_secret: key_base64
 
 - name: build
   image: mingc/android-build-box:1.9.0
@@ -41,16 +41,42 @@ steps:
     - name: cache_androidavd
       path: /opt/android-sdk/.android/avd
   commands:
-    - if [ ! $(command -v file) ]; then apt-get update ; apt-get -y install file ; fi
+    - sed -i '/.*versionName.*/s/"$/-sletteng-${DRONE_COMMIT_SHA:0:5}"/' ./app/build.gradle
     - bash ./gradlew assemble
+
+- name: gitea_release
+  image: plugins/gitea-release
+  settings:
+    api_key:
+      from_secret: gitea_api_key
+    base_url: https://git.home.sletteng.org
+    files:
+      - app/build/outputs/apk/release/app-release.apk
+      - app/build/outputs/apk/debug/app-debug.apk
+    checksum:
+      - md5
+      - sha1
+    draft: true
+  when:
+    ref:
+    - refs/heads/feature-*
+    - refs/tags/v*
+
+- name: prepare-artifacts
+  image: alpine
+  commands:
     - tar -czf ${DRONE_REPO_NAME}_${DRONE_COMMIT_SHA}_build.tar.gz app/build
+  when:
+    status:
+    - success
+    - failure
 
 - name: store-artifacts
   image: appleboy/drone-scp
   settings:
     host:
       from_secret: ssh_server
-    user: 
+    user:
       from_secret: ssh_user
     password:
       from_secret: ssh_password
@@ -58,6 +84,10 @@ steps:
       - ./*build.tar.gz
     target: 
       - /volume1/docker/gitea/drone-data/artifacts
+  when:
+    status:
+    - success
+    - failure
 
 - name: rebuild-cache
   image: appleboy/drone-sftp-cache
@@ -78,27 +108,14 @@ steps:
     username:
       from_secret: ssh_user
     password:
-      from_secret: ssh_password  
-    path: /docker/gitea/drone-data/cache
+      from_secret: ssh_password
+    path:
+      from_secret: ssh_cache_path
     rebuild: true
-
-- name: gitea_release
-  image: plugins/gitea-release
-  settings:
-    api_key:
-      from_secret: gitea_api_key
-    base_url: https://git.home.sletteng.org
-    files:
-      - app/build/outputs/apk/release/app-release.apk
-      - app/build/outputs/apk/debug/app-debug.apk
-
-    checksum:
-      - md5
-      - sha1
   when:
-    ref:
-    - refs/heads/feature-*
-    - refs/tags/v*
+    status:
+    - success
+    - failure
 
 volumes:
   - name: cache_gradle
